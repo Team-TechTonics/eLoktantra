@@ -26,6 +26,9 @@ importers:
       axios:
         specifier: ^1.13.6
         version: 1.13.6
+      libsodium-wrappers:
+        specifier: ^0.7.16
+        version: 0.7.16
       next:
         specifier: 16.1.6
         version: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -39,6 +42,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.2.1
+      '@types/libsodium-wrappers':
+        specifier: ^0.7.14
+        version: 0.7.14
       '@types/node':
         specifier: ^20
         version: 20.19.37

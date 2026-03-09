@@ -11,6 +11,10 @@ export const config = {
     issueReporting: { port: process.env.ISSUE_SERVICE_PORT || 4004, url: 'http://localhost:4004' },
     debate: { port: process.env.DEBATE_SERVICE_PORT || 4005, url: 'http://localhost:4005' },
     promiseTracker: { port: process.env.PROMISE_SERVICE_PORT || 4006, url: 'http://localhost:4006' },
-    misinformationAi: { port: process.env.AI_SERVICE_PORT || 4007, url: 'http://localhost:4007' },
+    voting: { port: process.env.VOTING_SERVICE_PORT || 4007, url: 'http://localhost:4007' },
+    identity: { port: process.env.IDENTITY_SERVICE_PORT || 4008, url: 'http://localhost:4008' },
+    ledger: { port: process.env.LEDGER_SERVICE_PORT || 4009, url: 'http://localhost:4009' },
+    audit: { port: process.env.AUDIT_SERVICE_PORT || 4010, url: 'http://localhost:4010' },
+    misinformationAi: { port: process.env.AI_SERVICE_PORT || 4011, url: 'http://localhost:4011' },
   }
 };

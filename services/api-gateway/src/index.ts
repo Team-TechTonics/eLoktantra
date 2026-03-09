@@ -36,6 +36,18 @@ fastify.register(proxy, {
   rewritePrefix: '/issues'
 });
 
+fastify.register(proxy, {
+  upstream: config.services.voting.url,
+  prefix: '/voting',
+  rewritePrefix: ''
+});
+
+fastify.register(proxy, {
+  upstream: config.services.audit.url,
+  prefix: '/audit',
+  rewritePrefix: '/audit'
+});
+
 const start = async () => {
   try {
     await fastify.listen({ port: PORT, host: '0.0.0.0' });
