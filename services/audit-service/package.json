@@ -1,5 +1,5 @@
 {
-  "name": "candidate-service",
+  "name": "audit-service",
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {

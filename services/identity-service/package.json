@@ -1,5 +1,5 @@
 {
-  "name": "candidate-service",
+  "name": "identity-service",
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
@@ -13,9 +13,11 @@
     "@supabase/supabase-js": "^2.39.0",
     "dotenv": "^16.3.1",
     "fastify": "^4.20.0",
-    "fastify-plugin": "^5.1.0"
+    "fastify-plugin": "^5.1.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@types/uuid": "^9.0.7",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.1.6"
   }

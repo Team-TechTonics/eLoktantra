@@ -1,5 +1,5 @@
 {
-  "name": "candidate-service",
+  "name": "blockchain-ledger-service",
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
@@ -12,6 +12,7 @@
     "@fastify/cors": "^8.3.0",
     "@supabase/supabase-js": "^2.39.0",
     "dotenv": "^16.3.1",
+    "ethers": "^6.9.0",
     "fastify": "^4.20.0",
     "fastify-plugin": "^5.1.0"
   },

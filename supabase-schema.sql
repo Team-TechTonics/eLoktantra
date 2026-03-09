@@ -29,3 +29,42 @@ VALUES
   ('Rahul Gandhi', 'INC', 'Wayanad', 'M.Phil', 5, 200000000, 2000000),
   ('Arvind Kejriwal', 'AAP', 'New Delhi', 'B.Tech', 15, 34000000, 0),
   ('Mamata Banerjee', 'AITC', 'Bhabanipur', 'MA, LLB', 0, 16000000, 0);
+
+
+-- E-Voting Tables
+
+CREATE TABLE elections (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title TEXT NOT NULL,
+  constituency TEXT NOT NULL,
+  start_time TIMESTAMP WITH TIME ZONE NOT NULL,
+  end_time TIMESTAMP WITH TIME ZONE NOT NULL,
+  status TEXT DEFAULT 'UPCOMING' -- UPCOMING, ACTIVE, COMPLETED
+);
+
+CREATE TABLE ballots (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  election_id UUID REFERENCES elections(id),
+  candidate_id UUID REFERENCES candidates(id),
+  candidate_name TEXT NOT NULL
+);
+
+CREATE TABLE voting_tokens (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  voter_id UUID NOT NULL, -- references Users table not directly connected here
+  election_id UUID REFERENCES elections(id),
+  token_hash TEXT NOT NULL UNIQUE,
+  used BOOLEAN DEFAULT false
+);
+
+CREATE TABLE votes (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  election_id UUID REFERENCES elections(id),
+  encrypted_vote TEXT NOT NULL,
+  blockchain_tx_hash TEXT,
+  timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Seed an Election
+INSERT INTO elections (id, title, constituency, start_time, end_time, status)
+VALUES ('e1111111-1111-1111-1111-111111111111', 'Varanasi General Election 2026', 'Varanasi', NOW() - INTERVAL '1 day', NOW() + INTERVAL '1 day', 'ACTIVE');

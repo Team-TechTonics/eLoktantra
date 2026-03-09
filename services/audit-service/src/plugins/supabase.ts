@@ -12,10 +12,6 @@ export default fp(async (fastify: FastifyInstance, opts: any) => {
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
-  if (!supabaseUrl || !supabaseKey) {
-    fastify.log.warn('Supabase URL or Key not found in environment variables.');
-  }
-
   const supabase = createClient(
     supabaseUrl || 'https://placeholder.supabase.co',
     supabaseKey || 'placeholder-key'
