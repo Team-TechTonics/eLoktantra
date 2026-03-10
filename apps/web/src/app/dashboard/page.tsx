@@ -1,39 +1,153 @@
-import React from 'react';
+import Link from 'next/link';
 
 export default function Dashboard() {
+  const recentIssues = [
+    { id: 1, title: 'Road repair in Dwarka Sector 10', status: 'In Progress', location: 'Dwarka' },
+    { id: 2, title: 'Street lighting issue in Rohini', status: 'Reported', location: 'Rohini' },
+  ];
+
+  const topCandidates = [
+    { id: 1, name: 'Arvind Sharma', party: 'Independent', constituency: 'South Delhi' },
+    { id: 2, name: 'Priya Verma', party: 'Socialist Party', constituency: 'South Delhi' },
+  ];
+
+  const recentPromises = [
+    { id: 1, title: '24/7 Water Supply', progress: 65, status: 'In Progress' },
+    { id: 2, title: 'New Public Park', progress: 100, status: 'Completed' },
+  ];
+
+  const elections = [
+    { id: 1, title: 'State Assembly 2024', status: 'Upcoming', date: 'Dec 15, 2024' },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Citizen Dashboard</h1>
-        <p className="text-gray-600">Welcome to eLoktantra. Track election transparency and civic issues in real-time.</p>
+    <div className="container mx-auto px-4 py-12">
+      <header className="mb-12">
+        <h1 className="text-4xl font-black mb-2 orange-text-gradient uppercase tracking-tight">Citizen Dashboard</h1>
+        <p className="text-gray-400 font-medium">Welcome back. Track election transparency and civic issues in your constituency.</p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Candidate Tracking Card */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h2 className="text-xl font-semibold mb-4">My Candidates</h2>
-          <p className="text-gray-600 mb-4">Follow candidate profiles and criminal record transparency.</p>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-            View Profiles
-          </button>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left Column - Main Updates */}
+        <div className="lg:col-span-8 space-y-8">
+          {/* Recent Civic Issues */}
+          <section className="glass-card p-8 border-white/5">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold flex items-center space-x-2">
+                <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span>Recent Civic Issues</span>
+              </h2>
+              <Link href="/issues" className="text-sm text-primary hover:text-accent font-bold">View All</Link>
+            </div>
+            <div className="space-y-4">
+              {recentIssues.map(issue => (
+                <div key={issue.id} className="flex items-center justify-between p-4 rounded-xl bg-secondary/50 border border-white/5 hover:border-primary/20 transition-all">
+                  <div>
+                    <h3 className="font-bold text-gray-200">{issue.title}</h3>
+                    <p className="text-sm text-gray-500">{issue.location}</p>
+                  </div>
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                    issue.status === 'In Progress' ? 'bg-orange-500/10 text-orange-500' : 'bg-blue-500/10 text-blue-500'
+                  }`}>
+                    {issue.status}
+                  </span>
+                </div>
+              ))}
+              <Link href="/issues/report" className="block w-full py-4 mt-2 text-center border border-dashed border-white/10 rounded-xl hover:border-primary/50 text-gray-400 hover:text-primary transition-all font-bold">
+                + Report New Issue
+              </Link>
+            </div>
+          </section>
+
+          {/* Recent Promises Tracker */}
+          <section className="glass-card p-8 border-white/5">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold flex items-center space-x-2">
+                <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Promise Tracker</span>
+              </h2>
+              <Link href="/promises" className="text-sm text-primary hover:text-accent font-bold">View All</Link>
+            </div>
+            <div className="space-y-6">
+              {recentPromises.map(promise => (
+                <div key={promise.id} className="space-y-2">
+                  <div className="flex justify-between text-sm font-bold">
+                    <span className="text-gray-200">{promise.title}</span>
+                    <span className="text-primary">{promise.progress}%</span>
+                  </div>
+                  <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-primary orange-gradient transition-all duration-1000" 
+                      style={{ width: `${promise.progress}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
 
-        {/* Issue Reporting Card */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h2 className="text-xl font-semibold mb-4">Report Issue</h2>
-          <p className="text-gray-600 mb-4">Report civic problems in your constituency for tracking.</p>
-          <button className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition">
-            Report Now
-          </button>
-        </div>
+        {/* Right Column - Sidebars */}
+        <div className="lg:col-span-4 space-y-8">
+          {/* Top Candidates */}
+          <section className="glass-card p-8 border-white/5">
+            <h2 className="text-xl font-bold mb-6 flex items-center space-x-2">
+              <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <span>Candidates</span>
+            </h2>
+            <div className="space-y-4">
+              {topCandidates.map(candidate => (
+                <Link 
+                  href={`/candidates/${candidate.id}`} 
+                  key={candidate.id}
+                  className="flex items-center space-x-4 p-3 rounded-xl hover:bg-white/5 transition-all group"
+                >
+                  <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center font-bold text-primary group-hover:bg-primary/20 group-hover:scale-110 transition-all">
+                    {candidate.name.charAt(0)}
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-200 group-hover:text-primary transition-colors">{candidate.name}</h3>
+                    <p className="text-xs text-gray-500">{candidate.party} • {candidate.constituency}</p>
+                  </div>
+                </Link>
+              ))}
+              <Link href="/candidates" className="block text-center py-3 text-sm font-bold text-gray-500 hover:text-white transition-colors">
+                View All Candidates
+              </Link>
+            </div>
+          </section>
 
-        {/* Promise Tracker Card */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h2 className="text-xl font-semibold mb-4">Promise Tracker</h2>
-          <p className="text-gray-600 mb-4">Check status and progress of manifestos and election promises.</p>
-          <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-            Check Status
-          </button>
+          {/* Election Announcements */}
+          <section className="glass-card p-8 border-white/5 bg-primary/5">
+            <h2 className="text-xl font-bold mb-6 flex items-center space-x-2">
+              <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.167a2.406 2.406 0 011.416-3.047 1.76 1.76 0 013.417-.592l2.147 6.167a2.406 2.406 0 01-1.416 3.047zM15.882 11.5l3.118 3.118M15.882 15.5l3.118-3.118" />
+              </svg>
+              <span>Elections</span>
+            </h2>
+            <div className="space-y-4">
+              {elections.map(election => (
+                <div key={election.id} className="p-4 rounded-xl bg-background border border-white/10">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-bold text-gray-200">{election.title}</h3>
+                    <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 bg-primary text-white rounded">
+                      {election.status}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-500 mb-4">{election.date}</p>
+                  <Link href={`/vote/${election.id}`} className="block w-full py-2 bg-primary hover:bg-accent text-white text-center text-sm font-bold rounded-lg transition-all">
+                    Register to Vote
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
       </div>
     </div>
