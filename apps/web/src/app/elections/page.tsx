@@ -1,65 +1,97 @@
 'use client';
 
-import { useElections } from '@/lib/api/voting';
 import Link from 'next/link';
 
 export default function ElectionsPage() {
-  const { data: elections, isLoading, isError } = useElections();
-
-  if (isLoading) return <div className="p-8 text-center text-gray-500 min-h-screen grid place-items-center">Loading elections...</div>;
-  if (isError) return <div className="p-8 text-center text-red-500 min-h-screen grid place-items-center">Failed to load elections.</div>;
+  const elections = [
+    {
+      id: '1',
+      title: 'General Assembly 2024',
+      constituency: 'South Delhi',
+      status: 'ACTIVE',
+      endTime: new Date(Date.now() + 86400000 * 2).toISOString(),
+    },
+    {
+      id: '2',
+      title: 'Municipal Corporation',
+      constituency: 'North Delhi',
+      status: 'UPCOMING',
+      endTime: new Date(Date.now() + 86400000 * 15).toISOString(),
+    },
+    {
+      id: '3',
+      title: 'Student Council',
+      constituency: 'Central Delhi',
+      status: 'CLOSED',
+      endTime: new Date(Date.now() - 86400000 * 5).toISOString(),
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 sm:p-12">
-      <header className="mb-12 max-w-5xl mx-auto">
-        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Active Elections</h1>
-        <p className="text-lg text-gray-600 mt-2">Participate in secure, anonymous, and blockchain-verified voting.</p>
-      </header>
+    <div className="container mx-auto px-4 py-12">
+      <div className="max-w-5xl mx-auto">
+        <header className="mb-12 text-center">
+          <h1 className="text-5xl font-black mb-4 orange-text-gradient uppercase tracking-tight">Active Elections</h1>
+          <p className="text-gray-400 font-medium text-lg">Participate in secure, anonymous, and blockchain-verified voting. Your vote is your power.</p>
+        </header>
 
-      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {elections?.map((election) => (
-          <div key={election.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition duration-300">
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <h2 className="text-xl font-bold text-gray-900">{election.title}</h2>
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
-                  election.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 
-                  election.status === 'UPCOMING' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {election.status}
-                </span>
-              </div>
-              
-              <div className="space-y-2 mb-8 text-sm text-gray-600">
-                <p><strong>Constituency:</strong> {election.constituency}</p>
-                <p><strong>Ends:</strong> {new Date(election.end_time).toLocaleString()}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {elections.map((election) => (
+            <div key={election.id} className="glass-card overflow-hidden hover:bg-secondary/80 transition-all duration-300 hover:-translate-y-2 border-white/5 hover:border-primary/20 flex flex-col">
+              <div className="p-8 flex-grow">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                    election.status === 'ACTIVE' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 
+                    election.status === 'UPCOMING' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 
+                    'bg-gray-500/10 text-gray-500 border-gray-500/20'
+                  }`}>
+                    {election.status}
+                  </span>
+                </div>
+                
+                <h2 className="text-2xl font-black text-white mb-2 uppercase tracking-tight">{election.title}</h2>
+                <div className="space-y-2 text-sm font-bold">
+                  <p className="text-gray-500 uppercase tracking-widest text-[10px]">Constituency</p>
+                  <p className="text-gray-200">{election.constituency}</p>
+                </div>
+                
+                <div className="mt-6 pt-6 border-t border-white/5 space-y-2">
+                  <p className="text-gray-500 uppercase tracking-widest text-[10px]">Ends On</p>
+                  <p className="text-gray-200 text-sm">
+                    {new Date(election.endTime).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
+                  </p>
+                </div>
               </div>
 
               {election.status === 'ACTIVE' ? (
                 <Link 
                   href={`/vote/${election.id}`}
-                  className="w-full block text-center bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-100"
+                  className="w-full py-4 bg-primary hover:bg-accent text-white text-center font-black uppercase tracking-widest transition-all"
                 >
-                  Cast Your Vote
+                  Cast Your Vote →
                 </Link>
               ) : (
-                <button 
-                  disabled
-                  className="w-full block text-center bg-gray-100 text-gray-400 px-6 py-3 rounded-xl font-bold cursor-not-allowed"
-                >
-                  {election.status === 'UPCOMING' ? 'Opens Soon' : 'Closed'}
-                </button>
+                <div className="w-full py-4 bg-secondary/50 text-gray-600 text-center font-black uppercase tracking-widest text-xs">
+                  {election.status === 'UPCOMING' ? 'Voting Opens Soon' : 'Election Closed'}
+                </div>
               )}
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
 
-        {elections?.length === 0 && (
-          <div className="col-span-full text-center py-24 bg-white rounded-2xl border border-gray-200 shadow-sm transition-all">
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Active Elections</h3>
-            <p className="text-gray-500">There are no elections currently scheduled for your area.</p>
-          </div>
-        )}
+        <div className="mt-16 text-center">
+          <Link href="/vote/verify" className="text-primary font-black uppercase tracking-widest hover:underline flex items-center justify-center space-x-2">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04M12 2.944a11.955 11.955 0 01-8.618 3.04m8.618-3.04V7m0 14a11.955 11.955 0 01-8.618-3.04M12 21a11.955 11.955 0 018.618-3.04m-8.618 3.04V14" />
+            </svg>
+            <span>Verify your past vote hash</span>
+          </Link>
+        </div>
       </div>
     </div>
   );

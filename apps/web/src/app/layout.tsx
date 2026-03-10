@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import ClientProviders from './client-providers';
+import Navbar from '@/components/Navbar';
 
 export const metadata: Metadata = {
   title: 'eLoktantra | Election Transparency',
@@ -13,10 +14,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="antialiased">
+    <html lang="en" className="dark scroll-smooth">
+      <body className="antialiased bg-background text-foreground selection:bg-primary/30">
         <ClientProviders>
-          {children}
+          <Navbar />
+          <main className="pt-16 min-h-screen">
+            {children}
+          </main>
         </ClientProviders>
       </body>
     </html>

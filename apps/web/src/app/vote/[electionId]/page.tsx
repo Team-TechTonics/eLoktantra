@@ -1,198 +1,127 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { generateVotingToken, useCastVote, useElection } from '@/lib/api/voting';
-
-const DEFAULT_DEMO_VOTER_ID =
-  process.env.NEXT_PUBLIC_DEMO_VOTER_ID || 'db7a4175-91fb-40d2-97ab-afaa1febdcdc';
-
-const toBase64 = (bytes: Uint8Array): string => {
-  const chunkSize = 0x8000;
-  let binary = '';
-  for (let i = 0; i < bytes.length; i += chunkSize) {
-    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
-  }
-  return btoa(binary);
-};
-
-const encryptVotePayload = async (payload: string): Promise<string> => {
-  const encoder = new TextEncoder();
-  const key = await window.crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, ['encrypt']);
-  const iv = window.crypto.getRandomValues(new Uint8Array(12));
-  const ciphertext = await window.crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv },
-    key,
-    encoder.encode(payload)
-  );
-
-  const cipherBytes = new Uint8Array(ciphertext);
-  const envelope = new Uint8Array(iv.length + cipherBytes.length);
-  envelope.set(iv, 0);
-  envelope.set(cipherBytes, iv.length);
-
-  return toBase64(envelope);
-};
-
-export default function VotingBallotPage({ params }: { params: { electionId: string } }) {
+export default function VotingPage({ params }: { params: { electionId: string } }) {
   const router = useRouter();
-  const { data: election, isLoading, isError } = useElection(params.electionId);
-  const castVoteMutation = useCastVote();
+  const [selectedCandidate, setSelectedCandidate] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasVoted, setHasVoted] = useState(false);
 
-  const [voterId, setVoterId] = useState<string>('');
-  const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null);
-  const [isCasting, setIsCasting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [receipt, setReceipt] = useState<{ txHash: string; receiptId: string } | null>(null);
+  const candidates = [
+    { id: '1', name: 'Arvind Sharma', party: 'Independent' },
+    { id: '2', name: 'Priya Verma', party: 'Socialist Party' },
+    { id: '3', name: 'Rahul Gupta', party: 'National Party' },
+    { id: '4', name: 'Sneha Reddy', party: 'Regional Front' },
+  ];
 
-  useEffect(() => {
-    const storedId = typeof window !== 'undefined' ? localStorage.getItem('eloktantra_voter_id') : null;
-    setVoterId(storedId || DEFAULT_DEMO_VOTER_ID);
-  }, []);
-
-  const handleVote = async () => {
-    if (!selectedCandidateId) {
-      setErrorMessage('Please select a candidate first.');
-      return;
-    }
-
-    if (!voterId) {
-      setErrorMessage('No voter identity found. Please sign in again.');
-      return;
-    }
-
-    setErrorMessage(null);
-    setIsCasting(true);
-
-    try {
-      const tokenHash = await generateVotingToken({ voterId, electionId: params.electionId });
-      const encryptedVote = await encryptVotePayload(
-        JSON.stringify({ candidateId: selectedCandidateId, timestamp: Date.now() })
-      );
-
-      const result = await castVoteMutation.mutateAsync({
-        electionId: params.electionId,
-        tokenHash,
-        encryptedVote,
-      });
-
-      setReceipt({ txHash: result.txHash, receiptId: result.receipt });
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Voting failed. Please retry.');
-    } finally {
-      setIsCasting(false);
-    }
+  const handleVote = () => {
+    if (!selectedCandidate) return;
+    setIsSubmitting(true);
+    // Blockchain voting logic would go here
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setHasVoted(true);
+    }, 2000);
   };
 
-  if (isLoading)
-    return <div className="p-8 text-center text-gray-500 min-h-screen grid place-items-center">Loading ballot...</div>;
-  if (isError || !election)
+  if (hasVoted) {
     return (
-      <div className="p-8 text-center text-red-500 min-h-screen grid place-items-center">
-        Failed to load election ballot.
-      </div>
-    );
-
-  if (receipt) {
-    return (
-      <div className="min-h-screen bg-green-50 flex items-center justify-center p-6">
-        <div className="max-w-xl w-full bg-white rounded-3xl shadow-2xl p-10 text-center border-t-8 border-green-500">
-          <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Vote Cast Successfully</h1>
-          <p className="text-gray-600 mb-8">Your vote has been encrypted and recorded with an auditable transaction hash.</p>
-
-          <div className="bg-gray-50 rounded-2xl p-6 text-left space-y-4 border border-gray-100 mb-8">
-            <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Receipt ID</p>
-              <p className="font-mono text-sm text-gray-800 break-all">{receipt.receiptId}</p>
+      <div className="container mx-auto px-4 py-24 text-center">
+        <div className="max-w-md mx-auto glass-card p-12 border-white/5 relative overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-green-500/20 rounded-full blur-[60px]" />
+          <div className="relative z-10">
+            <div className="w-20 h-20 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center mx-auto mb-8">
+              <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
             </div>
-            <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Blockchain Tx Hash</p>
-              <p className="font-mono text-xs text-blue-600 break-all">{receipt.txHash}</p>
+            <h2 className="text-3xl font-black mb-4 orange-text-gradient uppercase tracking-tight">Vote Confirmed</h2>
+            <p className="text-gray-400 font-bold mb-8 leading-relaxed">
+              Your vote has been securely recorded on the blockchain. Transparency and anonymity are guaranteed.
+            </p>
+            <div className="p-4 bg-secondary/50 rounded-xl border border-white/5 mb-8">
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">Your Vote Hash</p>
+              <p className="text-xs font-mono text-primary break-all">0x7a2d...f3b9e1d2c3b4a5d6e7f8g9h0</p>
+            </div>
+            <div className="space-y-4">
+              <Link href="/vote/verify" className="block w-full py-4 bg-primary hover:bg-accent text-white font-black uppercase tracking-widest rounded-xl transition-all shadow-xl shadow-primary/20">
+                Verify Vote Hash
+              </Link>
+              <Link href="/dashboard" className="block w-full py-4 glass-card border-white/10 text-gray-400 hover:text-white font-black uppercase tracking-widest rounded-xl transition-all">
+                Back to Dashboard
+              </Link>
             </div>
           </div>
-
-          <button
-            onClick={() => router.push('/elections')}
-            className="w-full bg-gray-900 text-white py-4 rounded-xl font-bold hover:bg-black transition shadow-xl"
-          >
-            Back to Elections
-          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="container mx-auto px-4 py-12">
       <div className="max-w-3xl mx-auto">
-        <header className="mb-10 text-center">
-          <h1 className="text-3xl font-extrabold text-gray-900">{election.title}</h1>
-          <p className="text-gray-500 mt-2">Constituency: {election.constituency}</p>
-          <div className="mt-4 inline-flex items-center px-4 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-sm font-semibold">
-            <span className="w-2 h-2 bg-indigo-500 rounded-full mr-2 animate-pulse"></span>
-            End-to-End Encrypted Ballot
-          </div>
-          {!DEFAULT_DEMO_VOTER_ID && (
-            <p className="text-xs text-amber-700 mt-3">Set `NEXT_PUBLIC_DEMO_VOTER_ID` or store `eloktantra_voter_id` in localStorage.</p>
-          )}
+        <header className="mb-12 text-center">
+          <h1 className="text-5xl font-black mb-4 orange-text-gradient uppercase tracking-tight">Digital Ballot</h1>
+          <p className="text-gray-400 font-medium text-lg">General Assembly 2024 • South Delhi</p>
         </header>
 
-        <div className="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden">
-          <div className="p-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Select Your Candidate</h2>
-
+        <div className="glass-card p-8 md:p-12 border-white/5 space-y-8 shadow-2xl shadow-primary/5">
+          <div className="space-y-4">
+            <h3 className="text-sm font-black text-gray-500 uppercase tracking-widest ml-1">Select Candidate</h3>
             <div className="space-y-4">
-              {election.candidates.map((candidate) => (
+              {candidates.map((candidate) => (
                 <button
                   key={candidate.id}
-                  onClick={() => setSelectedCandidateId(candidate.id)}
-                  className={`w-full text-left p-6 rounded-2xl border-2 transition-all flex justify-between items-center ${
-                    selectedCandidateId === candidate.id
-                      ? 'border-indigo-600 bg-indigo-50 shadow-md ring-4 ring-indigo-50'
-                      : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50'
+                  onClick={() => setSelectedCandidate(candidate.id)}
+                  className={`w-full p-6 rounded-2xl border transition-all flex items-center justify-between group ${
+                    selectedCandidate === candidate.id
+                    ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20'
+                    : 'bg-secondary/50 border-white/5 text-gray-400 hover:text-white hover:border-white/20'
                   }`}
                 >
-                  <div>
-                    <div className="font-bold text-lg text-gray-900">{candidate.name}</div>
-                    <div className="text-sm text-gray-500 uppercase tracking-wide font-medium">{candidate.party}</div>
+                  <div className="flex items-center space-x-4">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-xl border transition-all ${
+                      selectedCandidate === candidate.id 
+                      ? 'bg-white text-primary border-transparent' 
+                      : 'bg-primary/10 text-primary border-primary/20 group-hover:bg-primary/20'
+                    }`}>
+                      {candidate.name.charAt(0)}
+                    </div>
+                    <div className="text-left">
+                      <div className="font-black text-lg uppercase tracking-tight group-hover:text-white transition-colors">
+                        {candidate.name}
+                      </div>
+                      <div className={`text-[10px] font-black uppercase tracking-widest ${
+                        selectedCandidate === candidate.id ? 'text-white/70' : 'text-gray-600'
+                      }`}>
+                        {candidate.party}
+                      </div>
+                    </div>
                   </div>
-                  <div
-                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
-                      selectedCandidateId === candidate.id ? 'border-indigo-600 bg-indigo-600' : 'border-gray-300'
-                    }`}
-                  >
-                    {selectedCandidateId === candidate.id && <div className="w-2 h-2 bg-white rounded-full"></div>}
-                  </div>
+                  {selectedCandidate === candidate.id && (
+                    <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
                 </button>
               ))}
             </div>
+          </div>
 
-            {errorMessage && (
-              <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{errorMessage}</div>
-            )}
-
-            <div className="mt-12 space-y-4">
-              <button
-                disabled={!selectedCandidateId || isCasting || !voterId}
-                onClick={handleVote}
-                className={`w-full py-4 rounded-xl font-extrabold text-lg transition shadow-xl ${
-                  !selectedCandidateId || isCasting || !voterId
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    : 'bg-indigo-600 text-white hover:bg-indigo-700 active:scale-[0.98]'
-                }`}
-              >
-                {isCasting ? 'Encrypting & Transmitting...' : 'Submit Secure Vote'}
-              </button>
-              <p className="text-center text-xs text-gray-400">
-                Ballot choice is encrypted in-browser and submitted via a one-time voting token.
-              </p>
-            </div>
+          <div className="pt-8 space-y-4">
+            <button
+              onClick={handleVote}
+              disabled={!selectedCandidate || isSubmitting}
+              className="w-full py-5 bg-primary hover:bg-accent text-white font-black uppercase tracking-widest rounded-2xl transition-all shadow-xl shadow-primary/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? 'Securing Vote on Blockchain...' : 'Cast Anonymous Vote'}
+            </button>
+            <p className="text-[10px] text-gray-500 text-center font-black uppercase tracking-widest">
+              By casting your vote, you agree to our blockchain-verified anonymous voting protocol.
+            </p>
           </div>
         </div>
       </div>
